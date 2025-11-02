@@ -1,0 +1,98 @@
+{
+  "marketplace-name": "ایتاکالا",
+  "dashboard": "پیشخوان",
+  "basic-info": "اطلاعات پایه",
+  "settings": "تنظیمات",
+  "logout": "خروج از سیستم",
+  "add-new": "افزودن ",
+  "no-rows": "بدون ردیف",
+
+  "all": "همه",
+  "status": "وضعیت",
+
+  "vendors": "فروشندگان",
+
+  "vendors-list": "لیست فروشندگان",
+  "address-info": "اطلاعات آدرس",
+  "contact-info": "اطلاعات تماس",
+  "identity-info": "اطلاعات هویتی",
+
+  "enter": "ورود",
+  "switch-to-dark": "تغییر به حالت تیره",
+  "switch-to-light": "تغییر به حالت روشن",
+  "are-you-sure-logout": "آیا مطمئن هستید که می‌خواهید خارج شوید؟",
+
+  "edit": "ویرایش",
+
+  "cancel": "بستن",
+
+  "update": "به روزرسانی",
+
+  "no-categories": "دسته‌بندی‌ای وجود ندارد",
+
+  "select": "انتخاب",
+
+  "main-category": "دسته بندی اصلی",
+
+  "category-name": "نام دسته‌بندی",
+
+  "loading": "در حال بارگذاری",
+  "drop-here-to-root": "برای انتقال {0} به سطح اصلی اینجا رها کنید",
+  "no-categories-found": "هیچ دسته‌بندی‌ای یافت نشد",
+
+  "management": "مدیریت",
+
+  "delete": "حذف {0}",
+
+  "notifications": "اعلان‌ها",
+  "notification": "اعلان‌",
+
+  "ok": "باشه",
+
+  "list": "لیست",
+
+  "unit": "واحد کالا ",
+
+  "success": "موفقیت",
+  "save": "ذخیره",
+  "spec": "مشخصات",
+  "drag-drop": "برای آپلود تصویر کلیک کنید یا بکشید و اینجا رها کنید.",
+  "Actie": "فعال",
+  "InActive": "غیر فعال",
+
+  "add-successfully": "افزودن {0} جدید با موفقیت انجام شد",
+  "update-successfully": "ویرایش {0} با موفقیت انجام شد",
+  "delete-successfully": "حذف {0} موفقیت آمیز بود ",
+  "value": "مقدار",
+
+  "not-found-page-description": "به نظر می‌رسد این صفحه وجود ندارد یا هنوز ساخته نشده است.",
+  "not-found-page-404": "404 - صفحه یافت نشد!",
+  "back-to-home-page": "بازگشت به صفحه اصلی",
+
+  "under-cunstructor": "در حال ساخت!",
+  "coming-soon": "این صفحه هنوز آماده نیست! به زودی با محتوای جدید برمی‌گردیم.",
+  "user-cunstructor-message": "از صبر و شکیبایی شما سپاس گذاریم🛠️",
+
+  "fraudMind": "ذهن تحلیلگر تقلب",
+
+  "tables": "جداول",
+
+  "scenarios": "سناریوها",
+
+  "Drop your filled .csv here": " فایل CSV خود را اینجا بکشید و رها کنید",
+  "or click to select a file": "یا برای انتخاب فایل کلیک کنید ",
+  "Select File": "انتخاب فایل",
+
+  "Past uploads": "آخرین اپلود ها",
+  "upload data": "بارگذاری اطلاعات",
+  "understand": "متوجه شدم",
+  "are-you-sure-delet": "آیا از حذف {0} مطمئن هستید",
+  "no-item-added": "هیچ {0} اضافه نشده است",
+  "name": "نام {0}",
+  "kind": "نوع {0}",
+  "only-csv": "فقط فایل CSV مجاز است.",
+  "upload": "بارگذاری",
+  "file-uploaded-successfully": "فایل یا موفقیت بارگذاری شد",
+  "Upload": "بارگذاری",
+  "back": "بازگشت"
+}

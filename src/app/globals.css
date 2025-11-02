@@ -1,0 +1,83 @@
+/* Fonts */
+@font-face {
+  font-family: IRANSans;
+  font-style: normal;
+  font-weight: 200;
+  src: url("/fonts/IRANSansWeb_UltraLight.ttf") format("truetype");
+}
+@font-face {
+  font-family: IRANSans;
+  font-style: normal;
+  font-weight: 300;
+  src: url("/fonts/IRANSansWeb_Light.ttf") format("truetype");
+}
+@font-face {
+  font-family: IRANSans;
+  font-style: normal;
+  font-weight: normal;
+  src: url("/fonts/IRANSansWeb.ttf") format("truetype");
+}
+@font-face {
+  font-family: IRANSans;
+  font-style: normal;
+  font-weight: 600;
+  src: url("/fonts/IRANSansWeb_Medium.ttf") format("truetype");
+}
+@font-face {
+  font-family: IRANSans;
+  font-style: normal;
+  font-weight: 700;
+  src: url("/fonts/IRANSansWeb_Bold.ttf") format("truetype");
+}
+@font-face {
+  font-family: IRANSans;
+  font-style: normal;
+  font-weight: 900;
+  src: url("/fonts/IRANSansWeb_Black.ttf") format("truetype");
+}
+
+@font-face {
+  font-family: IranYekan;
+  font-style: normal;
+  font-weight: normal;
+  src: url(/fonts/IRYEKANR.ttf) format("truetype");
+}
+/* @font-face {
+  font-family: IranYekan;
+  font-style: normal;
+  font-weight: bold;
+  src: url(/fonts/IRYEKANB.ttf) format("truetype");
+} */
+@font-face {
+  font-family: IranYekan;
+  font-style: normal;
+  font-weight: 300;
+  src: url(/fonts/IRYEKANL.ttf) format("truetype");
+}
+
+/* Global variables */
+:root {
+  --color-yellow: #1d3557;
+  --color-red: #B90A33FF;
+  --color-charcoal: #457b9d;
+  --color-charcoal-light: #1d3557;
+  --color-hover-black: #a35467;
+  --color-black: #000000;
+  --color-white: #ffffff;
+  --color-grey: #ccc;
+  --cokor-Brown:#a8dadc;
+  --font-main: 'IranYekan', 'IRANSans', sans-serif;
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-main);
+  background-color: var(--color-grey);
+  color: var(--color-black);
+}
+
+
+.menu-icon {
+  color: var(--color-grey);
+}

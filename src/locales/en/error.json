@@ -1,0 +1,8 @@
+{
+  "required-field": "This field is required..",
+  "caps-lock-is-on": "Caps Lock is on.",
+  "invalid-email": "email format is not valid",
+  "min-length": "حداقل طول {min} کاراکتر است",
+  "max-length": "حداکثر طول {max} کاراکتر است",
+  "password-mismatch": "رمز عبور با تأییدیه مطابقت ندارد"
+}
