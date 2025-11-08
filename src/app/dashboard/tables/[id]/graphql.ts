@@ -1,14 +1,14 @@
-import { InputIdVariable, ResultData } from "@/graphql/query-types";
+import { ResultData } from "@/graphql/query-types";
 import { gql, TypedDocumentNode } from "@apollo/client";
 
 export const uploadDataMutation: TypedDocumentNode<
   ResultData<{ path: string }>,
   UploadCsvVariable
 > = gql`
-  mutation uploadDataMutation($input: UploadCsvInput!) {
-    uploadCsv(input: $input) {
+  mutation uploadDataMutation($input: UploadInput!) {
+    uploadFile(input: $input) {
       result {
-        path
+        effectedRows
         __typename
       }
     }

@@ -1,5 +1,12 @@
-'use client';
-import React, { PropsWithChildren, createContext, useContext, useState, useEffect, useMemo } from "react";
+"use client";
+import React, {
+  PropsWithChildren,
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  useMemo,
+} from "react";
 import createCache from "@emotion/cache";
 import { prefixer } from "stylis";
 import rtlPlugin from "@mui/stylis-plugin-rtl";
@@ -57,7 +64,7 @@ export default function AppThemeProvider({ children }: PropsWithChildren) {
           secondary: { main: mode === "light" ? "#dc004e" : "#f48fb1" },
           background: {
             default: mode === "light" ? "#f5f5f5" : "#121212",
-            paper: mode === "light" ? "#f5f5f5" : "#1d1d1d",
+            paper: mode === "light" ? "#ffffffff" : "#272a3d",
           },
         },
         typography: {
@@ -70,7 +77,7 @@ export default function AppThemeProvider({ children }: PropsWithChildren) {
           MuiCssBaseline: {
             styleOverrides: {
               body: {
-                backgroundColor: mode === "light" ? "#f5f5f5" : "#121212",
+                backgroundColor: mode === "light" ? "#f2f4f5" : "#3c4a63",
                 color: mode === "light" ? "rgba(0, 0, 0, 0.87)" : "#fff",
                 fontFamily: '"IranYekan", "IRANSans", Arial, sans-serif',
               },

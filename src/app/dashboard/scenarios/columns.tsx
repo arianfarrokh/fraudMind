@@ -9,8 +9,7 @@ export const useFieldColumns = (
   const { t } = useTranslation("form");
 
   return [
-    { field: "columnIndex", headerName: t("form", "columnIndex"), flex: 1 },
-    { field: "name", headerName: t("common", "name"), flex: 1 },
+    { field: "name", headerName: "Name", flex: 1 },
     { field: "title", headerName: t("form", "title"), flex: 1 },
     {
       field: "columnType",

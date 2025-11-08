@@ -3,6 +3,7 @@
 import {
   Box,
   Button,
+  CircularProgress,
   Divider,
   IconButton,
   Tooltip,
@@ -20,10 +21,12 @@ import { uploadDataMutation } from "./graphql";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import Link from "next/link";
 import { useThemeContext } from "@/theme/ThemeContext";
+import { useParams } from "next/navigation";
 
 const UploadData = () => {
   const columns = useUploadDataColumns();
   const { mode } = useThemeContext();
+  const { id } = useParams();
 
   const [uploadData, { loading: uploading }] = useMutation(uploadDataMutation);
 
@@ -40,21 +43,24 @@ const UploadData = () => {
     setIsDragging(false);
 
     const droppedFile = e.dataTransfer.files[0];
-    if (droppedFile && droppedFile.type === "text/csv") {
-      setFile(droppedFile);
-    } else {
-      showDialog(
-        t("error", "invalid-file"),
-        <Box textAlign={"center"}>{t("common", "only-csv")}</Box>,
-
-        {
-          onConfirm: () => hide(),
-          confirmText: t("common", "understand"),
-          titleTextAlign: "center",
-        }
-      );
+    if (droppedFile) {
+      const ext = droppedFile.name.split(".").pop()?.toLowerCase();
+      if (["csv", "txt", "unl"].includes(ext || "")) {
+        setFile(droppedFile);
+      } else {
+        showDialog(
+          t("error", "invalid-file"),
+          <Box textAlign={"center"}>{t("error", "only-csv-txt-unl")}</Box>,
+          {
+            onConfirm: () => hide(),
+            confirmText: t("common", "understand"),
+            titleTextAlign: "center",
+          }
+        );
+      }
     }
   };
+
   //*handle File Select
   const handleFileSelect = (e: ChangeEvent<HTMLInputElement>) => {
     const selectedFile = e.target.files?.[0];
@@ -85,7 +91,9 @@ const UploadData = () => {
       await uploadData({
         variables: {
           input: {
-            csvFile: file,
+            uploadFile: file,
+            kind: "DATA_CSV",
+            tableId: Number(id),
           },
         },
       });
@@ -116,6 +124,20 @@ const UploadData = () => {
       );
     }
   };
+
+  if (uploading) {
+    return (
+      <Box
+        p={4}
+        display="flex"
+        justifyContent="center"
+        alignItems="center"
+        minHeight="60vh"
+      >
+        <CircularProgress />
+      </Box>
+    );
+  }
 
   return (
     <Box

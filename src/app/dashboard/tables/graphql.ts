@@ -1,12 +1,10 @@
 import { gql, TypedDocumentNode } from "@apollo/client";
 import {
   AllRowQuery,
-  AllRowQueryNoPaginate,
   InputIdVariable,
   InputVariable,
   PaginationVariable,
   QueryFilter,
-  ResultById,
   ResultData,
 } from "@/graphql/query-types";
 
@@ -20,7 +18,7 @@ export interface AllTablesOrder {
 export interface AllTablesFilter {
   name?: QueryFilter;
   description?: QueryFilter;
-  schemaId?: QueryFilter;
+  fraudMindSchemaId?: QueryFilter;
 }
 
 export interface AllTablesVariables extends PaginationVariable {
@@ -66,6 +64,7 @@ export const allTablesQuery: TypedDocumentNode<
           title
           description
           columnType
+          columnIndex
           isNullable
           isUnique
         }

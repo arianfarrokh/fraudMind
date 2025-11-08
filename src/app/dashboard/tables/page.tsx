@@ -9,28 +9,20 @@ import {
   IconButton,
   Stack,
   Collapse,
-  FormControlLabel,
-  Checkbox,
-  Autocomplete,
   Tooltip,
+  Divider,
+  CircularProgress,
+  Pagination,
 } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import ExpandLessIcon from "@mui/icons-material/ExpandLess";
 import PlaylistAddIcon from "@mui/icons-material/PlaylistAdd";
-import { TbEdit } from "react-icons/tb";
-import DialogComponent from "@/components/dialog-component/DialogComponent";
 import DataGridViewServer from "@/components/data-grid/DataGridViewServer";
-import {
-  DeleteActionItem,
-  // EditActionItem,
-  FullWidthTextField,
-} from "@/components";
+import { DeleteActionItem } from "@/components";
 import { useFieldColumns } from "./columns";
-import { useFormik } from "formik";
-import * as yup from "yup";
 import { useTranslation } from "@/providers/translation";
-import { useLazyQuery, useMutation, useQuery } from "@apollo/client/react";
+import { useMutation, useQuery } from "@apollo/client/react";
 import {
   addNewColumnMutation,
   addNewTableMutation,
@@ -46,6 +38,12 @@ import { useSelector } from "react-redux";
 import { RootState } from "@/store";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import Link from "next/link";
+import { useAlert } from "@/providers/alert-provider/AlertProvider";
+import CustomPaginate from "@/components/pagination/CustomPaginate";
+import { BsDatabaseCheck } from "react-icons/bs";
+import { motion } from "framer-motion";
+import { useThemeContext } from "@/theme/ThemeContext";
+import SelectSchema from "@/components/SelectSchema";
 
 const initialTableValues: FraudMindTableType = {
   id: 0,
@@ -61,21 +59,39 @@ const initialColumnTableValues: FraudMindColumnType = {
   isNullable: false,
   description: "",
   isUnique: false,
+  columnIndex: 0,
 };
 
 // ---------- main component ----------
 const TablesPage = () => {
+  const [page, setPage] = React.useState(1); // current page number (1-based)
+  const [pageSize, setPageSize] = React.useState(5); // rows per page
+
   const [expandedTableId, setExpandedTableId] = useState<number | null>(null);
   const { show, hide } = useDialog();
+  const { show: showAlert } = useAlert();
   const { t } = useTranslation("common", "form");
 
   const { schemaId } = useSelector((store: RootState) => store.fraudMindSchema);
 
-  const { data, loading, error } = useQuery(allTablesQuery, {
+  const { mode } = useThemeContext();
+
+  const {
+    data,
+    loading: queryLoading,
+    error: queryError,
+    refetch,
+  } = useQuery(allTablesQuery, {
     variables: {
-      where: { and: [{ schemaId: { eq: schemaId } }] },
+      first: pageSize,
+      // after: currentAfter,
+      where: { and: [{ fraudMindSchemaId: { eq: schemaId } }] },
     },
+    //!hanle error
   });
+
+  const totalCount = data?.result.totalCount ?? 0;
+  let pageCount = Math.ceil(totalCount / pageSize);
 
   // add new table mutation
   const [addNewTable] = useMutation(addNewTableMutation, {
@@ -84,13 +100,22 @@ const TablesPage = () => {
       {
         query: allTablesQuery,
         variables: {
-          where: { and: [{ schemaId: { eq: schemaId } }] },
+          where: { and: [{ fraudMindSchemaId: { eq: schemaId } }] },
         },
       },
     ],
     awaitRefetchQueries: true,
     onCompleted: () => {
       hide();
+    },
+    onError: (error) => {
+      showAlert({
+        type: "error",
+        message:
+          error.message ||
+          formatString(t("error", "failed-to-load"), t("form", "tables")),
+        autoHideDuration: 3000,
+      });
     },
   });
   // add new column mutation
@@ -100,31 +125,58 @@ const TablesPage = () => {
       {
         query: allTablesQuery,
         variables: {
-          where: { and: [{ schemaId: { eq: schemaId } }] },
+          where: { and: [{ fraudMindSchemaId: { eq: schemaId } }] },
         },
       },
     ],
     awaitRefetchQueries: true,
     onCompleted: () => {
       hide();
+      showAlert({
+        type: "success",
+        message: formatString(
+          t("common", "add-successfully"),
+          t("form", "column")
+        ),
+        autoHideDuration: 3000,
+      });
+    },
+    onError: (error) => {
+      showAlert({
+        type: "error",
+        message:
+          error.message ||
+          formatString(t("error", "failed-to-add"), t("form", "column")),
+        autoHideDuration: 3000,
+      });
     },
   });
 
-  const [
-    deleteRecord,
-    { data: deleteData, error: deleteError, loading: deleteLoading },
-  ] = useMutation(deleteTableMutation, {
-    refetchQueries: [
-      {
-        query: allTablesQuery,
-        variables: {
-          where: { and: [{ schemaId: { eq: schemaId } }] },
-        },
-      },
-    ],
-    awaitRefetchQueries: true,
+  const [deleteRecord] = useMutation(deleteTableMutation, {
     onCompleted: () => {
       hide();
+      showAlert({
+        type: "success",
+        message: formatString(
+          t("common", "delete-successfully"),
+          t("form", "table")
+        ),
+        autoHideDuration: 3000,
+      });
+      // دستی refetch با variables کامل
+      refetch({
+        first: pageSize,
+        where: { and: [{ fraudMindSchemaId: { eq: schemaId } }] },
+      });
+    },
+    onError: (error) => {
+      showAlert({
+        type: "error",
+        message:
+          error.message ||
+          formatString(t("error", "failed-to-delete"), t("form", "table")),
+        autoHideDuration: 3000,
+      });
     },
   });
 
@@ -140,45 +192,37 @@ const TablesPage = () => {
       {
         query: allTablesQuery,
         variables: {
-          where: { and: [{ schemaId: { eq: schemaId } }] },
+          where: { and: [{ fraudMindSchemaId: { eq: schemaId } }] },
         },
       },
     ],
     awaitRefetchQueries: true,
     onCompleted: () => {
       hide();
+      showAlert({
+        type: "success",
+        message: formatString(
+          t("common", "delete-successfully"),
+          t("form", "column")
+        ),
+        autoHideDuration: 3000,
+      });
+    },
+    onError: (error) => {
+      showAlert({
+        type: "error",
+        message:
+          error.message ||
+          formatString(t("error", "failed-to-delete"), t("form", "column")),
+        autoHideDuration: 3000,
+      });
     },
   });
 
-  // const loadData = () => {
-  //   loadTableData({
-  //     variables: {
-  //       where: {
-  //         and: [
-  //           {
-  //             schemaId: {
-  //               eq: schemaId,
-  //             },
-  //           },
-  //         ],
-  //       },
-  //     },
-  //   });
-  // };
-
-  // useEffect(
-  //   () => {
-  //     loadData();
-  //   },
-  //   [
-  //    schemaId
-  //   ]
-  // );
-
   const handleDeleteColumn = (id: ID) => {
     show(
-      "حذف جدول",
-      formatString(t("form", "delete-content-dialog"), t("form", "table")),
+      formatString(t("common", "deletee"), t("form", "column")),
+      formatString(t("form", "delete-content-dialog"), t("form", "column")),
       {
         maxWidth: "xs",
         confirmText: t("common", "delete"),
@@ -206,7 +250,7 @@ const TablesPage = () => {
       variables: {
         input: {
           id: 0,
-          schemaId: 2,
+          fraudMindSchemaId: schemaId,
           name: data.name,
           description: data.description,
           columns: [],
@@ -242,7 +286,8 @@ const TablesPage = () => {
           title: data.title,
           description: data.description || "",
           columnType: data.columnType,
-          tableId: data.tableId,
+          columnIndex: data.columnIndex,
+          fraudMindTableId: data.tableId,
           isNullable: data.isNullable,
           isUnique: data.isUnique,
         },
@@ -253,11 +298,12 @@ const TablesPage = () => {
     hide();
   };
 
-  const handleAddColumnTable = (tableId: ID) => {
+  const handleAddColumnTable = (table: FraudMindTableType) => {
+    const columnIndex = table.fraudMindColumns.length;
     show(
       `${formatString(t("common", "add-new"), t("form", "database"))}`,
       <AddColumnTableForm
-        data={{ ...initialColumnTableValues, tableId }}
+        data={{ ...initialColumnTableValues, tableId: table.id, columnIndex }}
         onSave={handleAddNewColumnTable}
         onCancel={hide}
       />,
@@ -290,6 +336,58 @@ const TablesPage = () => {
     );
   };
 
+  const handleChangePage = (
+    event: React.ChangeEvent<unknown>,
+    pageNumber: number
+  ) => {
+    setPage(pageNumber);
+
+    console.log(pageNumber);
+    const startCursor = btoa((pageSize * (pageNumber - 1) - 1).toString());
+
+    console.log(startCursor);
+
+    refetch({
+      after: startCursor,
+      first: pageSize,
+    });
+  };
+
+  useEffect(() => {
+    setPage(1);
+    refetch({
+      after: null,
+      first: pageSize,
+    });
+  }, [schemaId]);
+
+  // if (queryLoading) {
+  //   return (
+  //     <Box
+  //       p={4}
+  //       display="flex"
+  //       justifyContent="center"
+  //       alignItems="center"
+  //       minHeight="60vh"
+  //     >
+  //       <CircularProgress />
+  //     </Box>
+  //   );
+  // }
+
+  // حالت خطای کوئری
+  if (queryError) {
+    showAlert({
+      type: "error",
+      message: queryError.message,
+      autoHideDuration: 3000,
+    });
+  }
+
+  if (!schemaId) {
+    return <SelectSchema />;
+  }
+
   return (
     <Box p={4} dir="rtl">
       {/* Header */}
@@ -299,30 +397,44 @@ const TablesPage = () => {
         alignItems="center"
         mb={3}
       >
-        <Typography variant="h4" fontWeight="bold">
+        <Typography variant="h5" fontWeight="bold">
           {t("form", "tables")}
         </Typography>
         <Button
           variant="contained"
           startIcon={<AddIcon />}
           onClick={handleAddTable}
+          disabled={!schemaId}
+          sx={{ background: "var(--color-sideblue)" }}
         >
           {formatString(t("common", "add-new"), t("form", "table"))}
         </Button>
       </Stack>
 
       {/* Tables */}
+      {queryLoading && (
+        <Box
+          p={4}
+          display="flex"
+          justifyContent="center"
+          alignItems="center"
+          minHeight="60vh"
+          position={"fixed"}
+          top={0}
+          left={0}
+          right={0}
+          bottom={0}
+          bgcolor={"rgba(0,0,0, .5)"}
+        >
+          <CircularProgress />
+        </Box>
+      )}
       <Stack spacing={2}>
         {data?.result.nodes?.map((table) => (
           <Card
-            onClick={() =>
-              setExpandedTableId(expandedTableId === table.id ? null : table.id)
-            }
             key={table.id}
             sx={{
               borderRadius: 3,
-              cursor: "pointer",
-              transition: "background-color 0.2s ease",
               "&:hover": {
                 bgcolor: "action.hover",
               },
@@ -334,7 +446,21 @@ const TablesPage = () => {
                 justifyContent="space-between"
                 alignItems="center"
               >
-                <Stack direction="row" spacing={1} alignItems="center">
+                <Stack
+                  onClick={() =>
+                    setExpandedTableId(
+                      expandedTableId === table.id ? null : table.id
+                    )
+                  }
+                  sx={{
+                    cursor: "pointer",
+                    flex: 1,
+                    transition: "background-color 0.2s ease",
+                  }}
+                  direction="row"
+                  spacing={1}
+                  alignItems="center"
+                >
                   <IconButton
                     onClick={() =>
                       setExpandedTableId(
@@ -349,8 +475,14 @@ const TablesPage = () => {
                     )}
                   </IconButton>
                   <Stack>
-                    <Typography variant="h6">{table.name}</Typography>
-                    <Typography color="textDisabled" variant="body2">
+                    <Typography variant="h6" fontSize={"1.1rem"}>
+                      {table.name}
+                    </Typography>
+                    <Typography
+                      fontSize={".7rem"}
+                      color="textDisabled"
+                      variant="body2"
+                    >
                       {table.description}
                     </Typography>
                   </Stack>
@@ -369,7 +501,6 @@ const TablesPage = () => {
                     }}
                     href={""}
                   /> */}
-                  {/* hey chatgpt i want this IconButton below to get the id  of the table and go to another page */}
                   <Tooltip title={t("common", "upload")} arrow>
                     <IconButton
                       LinkComponent={Link}
@@ -381,12 +512,13 @@ const TablesPage = () => {
 
                   <IconButton
                     color="secondary"
-                    onClick={() => handleAddColumnTable(table.id)}
+                    onClick={() => handleAddColumnTable(table)}
                   >
                     <PlaylistAddIcon />
                   </IconButton>
                 </Stack>
               </Stack>
+              <Divider />
 
               {/* Collapsible Field Table */}
               <Collapse in={expandedTableId === table.id}>
@@ -395,11 +527,12 @@ const TablesPage = () => {
                     <DataGridViewServer
                       rows={table.fraudMindColumns}
                       columns={fieldColumns}
-                      totalCount={table.fraudMindColumns.length}
+                      // totalCount={table.fraudMindColumns.length}
                       loading={false}
                       gridPaginationModel={{ page: 0, pageSize: 5 }}
                       sortingMode="client"
                       filterMode="client"
+                      paginationMode="client"
                     />
                   </Box>
                 ) : (
@@ -408,7 +541,6 @@ const TablesPage = () => {
                     color="text.secondary"
                     sx={{ mt: 2, ml: 5 }}
                   >
-                    {/* هیچ فیلدی اضافه نشده  */}
                     {formatString(
                       t("common", "no-item-added"),
                       t("form", "field")
@@ -420,6 +552,20 @@ const TablesPage = () => {
           </Card>
         ))}
       </Stack>
+      {/* handle paginate */}
+      {schemaId && (totalCount ?? 0) > pageSize && (
+        <Box display="flex" justifyContent="center" mt={4}>
+          <CustomPaginate
+            onChange={handleChangePage}
+            page={page}
+            pageCount={pageCount}
+            queryLoading={queryLoading}
+            color="secondary"
+            shape="circular"
+            size="large"
+          />
+        </Box>
+      )}
     </Box>
   );
 };

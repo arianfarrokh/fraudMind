@@ -1,5 +1,6 @@
 "use client";
-import React, { useEffect } from "react";
+
+import React, { useEffect, useState } from "react";
 import {
   Grid,
   Paper,
@@ -8,14 +9,16 @@ import {
   IconButton,
   TextField,
   Autocomplete,
+  Box,
+  CircularProgress,
 } from "@mui/material";
 import AddCircleSharpIcon from "@mui/icons-material/AddCircleSharp";
-//! dont delet this comment
+//!Please don't delete these comments
 // import EditSharpIcon from "@mui/icons-material/EditSharp";
 import DeleteSharpIcon from "@mui/icons-material/DeleteSharp";
 import {
   addNewSchemaMutation,
-  //! dont delet this comment
+  //!Please don't delete these comments
   // updateSchemaMutation,
   deleteSchemaMutation,
   allSchemasNoPagedQuery,
@@ -27,100 +30,179 @@ import { useTranslation } from "@/providers/translation";
 import { formatString } from "@/utils";
 import { useDispatch } from "react-redux";
 import { setSchemaId } from "@/store/schema-slicet";
+import { useAlert } from "@/providers/alert-provider/AlertProvider";
 
 const initialValues: SchemaType = {
+  // مقادیر اولیه برای فرم افزودن دیتابیس جدید
   id: 0,
   name: "",
   description: "",
 };
 
 export default function DashboardDataBaseSelector() {
-  const { show, hide } = useDialog();
+  // استفاده از Dialog Provider برای باز و بسته کردن دیالوگ‌ها
+  const { show: showDialog, hide: hideDialog } = useDialog();
+  // استفاده از Alert Provider برای نمایش پیام‌های موفقیت یا خطا
+  const { show } = useAlert();
+  // hook ترجمه چندزبانه
   const { t } = useTranslation("common", "form");
-
+  // dispatch برای ارسال اکشن به redux
   const dispatch = useDispatch();
 
-  const [selectedDB, setSelectedDB] = React.useState<{
-    id: number;
-    name: string;
-  } | null>(null);
-
+  // گرفتن لیست همه schemaها از سرور (بدون pagination)
   const {
     data: schemasData,
     loading,
     error,
-    refetch,
   } = useQuery(allSchemasNoPagedQuery);
 
-  const [addNewRecord] = useMutation(addNewSchemaMutation, {
-    onCompleted: () => refetch(),
+  // تبدیل داده‌ها به آرایه‌ای از گزینه‌ها برای autocomplete
+  const databaseOptions = [...(schemasData?.result ?? [])];
+
+  // نگهداری state مربوط به دیتابیس انتخاب‌شده
+  const [selectedDB, setSelectedDB] = useState<{
+    id: number;
+    name: string;
+  } | null>(null);
+
+  /**
+   * این تابع برای مدیریت و نمایش پیام‌های موفقیت یا خطا بعد از اجرای mutation ها استفاده میشه.
+   * بسته به وضعیت (در حال لود، موفق، خطا) پیام مناسب رو نشون میده.
+   */
+  const useMutationAlert = ({
+    loading,
+    data,
+    error,
+    successMessage,
+    errorMessage,
+    show,
+  }: UseMutationAlertProps) => {
+    useEffect(() => {
+      if (loading) return; // وقتی در حال لود هست، کاری انجام نده
+
+      if (data) {
+        const response = data?.response;
+
+        // اگر پاسخ شامل خطا بود، پیام خطا نمایش بده
+        if (response?.errors?.length) {
+          show({
+            message: response.errors[0]?.message,
+            type: "error",
+            autoHideDuration: 3000,
+          });
+        } else {
+          // در غیر اینصورت پیام موفقیت نمایش بده
+          show({
+            message: successMessage,
+            type: "success",
+            autoHideDuration: 2000,
+          });
+        }
+      }
+      setSelectedDB(null); // پس از اتمام عملیات، انتخاب رو خالی کن
+
+      if (error) {
+        // در صورت وجود خطا، پیام خطا نمایش داده می‌شود
+        show({
+          message: errorMessage || "عملیات با خطا مواجه شد",
+          type: "error",
+          autoHideDuration: 2000,
+        });
+      }
+    }, [loading, data, error, successMessage, errorMessage, show]);
+  };
+
+  // 📌 Mutation برای افزودن schema جدید
+  const [
+    addNewRecord,
+    { data: addData, loading: addLoading, error: addError },
+  ] = useMutation(addNewSchemaMutation, {
+    refetchQueries: [
+      {
+        query: allSchemasNoPagedQuery, // بعد از افزودن، لیست دوباره از سرور گرفته میشه
+      },
+    ],
+    awaitRefetchQueries: true,
     fetchPolicy: "no-cache",
   });
-  //! dont delet this comment
-  // const [update] = useMutation(updateSchemaMutation, {
-  //   onCompleted: () => refetch(),
-  //   fetchPolicy: "no-cache",
-  // });
 
-  const [deleteSchema] = useMutation(deleteSchemaMutation, {
-    onCompleted: () => refetch(),
+  // مدیریت پیام‌های افزودن (موفقیت/خطا)
+  useMutationAlert({
+    data: addData,
+    loading: addLoading,
+    error: addError,
+    successMessage: formatString(
+      t("common", "add-successfully"),
+      t("form", "database")
+    ),
+    errorMessage: formatString(
+      t("error", "failed-to-add"),
+      t("form", "database")
+    ),
+    show,
   });
 
-  const dataBases = schemasData?.result ?? [];
+  // 📌 Mutation برای حذف schema
+  const [
+    deleteSchema,
+    { data: deleteData, error: deleteError, loading: deleteLoading },
+  ] = useMutation(deleteSchemaMutation, {
+    refetchQueries: [
+      {
+        query: allSchemasNoPagedQuery, // بعد از حذف، لیست دوباره به‌روزرسانی می‌شود
+      },
+    ],
+    awaitRefetchQueries: true,
+  });
 
+  // مدیریت پیام‌های حذف (موفقیت/خطا)
+  useMutationAlert({
+    loading: deleteLoading,
+    data: deleteData,
+    error: deleteError,
+    successMessage: formatString(
+      t("common", "delete-successfully"),
+      t("form", "database")
+    ),
+    errorMessage: formatString(
+      t("error", "delete-content-error"),
+      t("form", "database")
+    ),
+    show,
+  });
+
+  // تابعی برای افزودن دیتابیس جدید (در دیالوگ ثبت فرم)
   const handleAddNewDatabase = (data: SchemaType) => {
     addNewRecord({
       variables: {
         input: {
+          id: 0,
           name: data.name,
           description: data.description,
         },
       },
     });
-    hide();
+    hideDialog(); // بستن دیالوگ بعد از ثبت
   };
-  //! dont delet this comment
-  // const handleEditDatabase = (data: SchemaType) => {
-  //   update({
-  //     variables: {
-  //       input: {
-  //         id: data.id,
-  //         name: data.name,
-  //         description: data.description,
-  //       },
-  //     },
-  //   });
-  //   hide();
-  // };
 
+  // تابعی برای باز کردن دیالوگ افزودن دیتابیس جدید
   const handleAdd = () => {
-    show(
+    showDialog(
       `${formatString(t("common", "add-new"), t("form", "database"))}`,
       <DashboardDataBaseSelectorForm
         data={initialValues}
         onSave={handleAddNewDatabase}
-        onCancel={hide}
+        onCancel={hideDialog}
       />,
       { maxWidth: "xs" }
     );
   };
-  //! dont delet this comment
-  // const handleEdit = () => {
-  //   if (!selectedDB) return;
-  //   show(
-  //     `${formatString(t("common" , "edit") , t("form" , "database"))}`,
-  //     <DashboardDataBaseSelectorForm
-  //       data={selectedDB}
-  //       onSave={handleEditDatabase}
-  //       onCancel={hide}
-  //     />,
-  //     { maxWidth: "xs" }
-  //   );
-  // };
 
+  // تابعی برای حذف دیتابیس انتخاب‌شده
   const handleDelete = () => {
     if (!selectedDB) return;
-    show(
+
+    showDialog(
       `${formatString(t("common", "delete"), t("form", "database"))}`,
       `${formatString(t("common", "are-you-sure-delet"), selectedDB?.name)}`,
       {
@@ -129,19 +211,36 @@ export default function DashboardDataBaseSelector() {
         cancelText: t("form", "close"),
         onConfirm: () => {
           deleteSchema({ variables: { input: { id: Number(selectedDB.id) } } });
-          hide();
+          hideDialog();
         },
-        onCancel: hide,
+        onCancel: hideDialog,
       }
     );
   };
 
+  // هر بار که دیتابیس انتخابی تغییر کند، آن را در redux ذخیره می‌کند
   useEffect(() => {
     if (selectedDB) {
       dispatch(setSchemaId(selectedDB.id));
     }
   }, [selectedDB]);
 
+  // اگر در حال افزودن یا حذف هستیم، اسپینر لودینگ نمایش داده شود
+  if (addLoading || deleteLoading) {
+    return (
+      <Box
+        p={4}
+        display="flex"
+        justifyContent="center"
+        alignItems="center"
+        minHeight="60vh"
+      >
+        <CircularProgress />
+      </Box>
+    );
+  }
+
+  // بخش رابط کاربری اصلی
   return (
     <Grid container>
       <Grid>
@@ -149,45 +248,53 @@ export default function DashboardDataBaseSelector() {
           sx={{
             my: 2,
             mx: 2,
-            width: { xs: 450, sm: 580 },
+            // width: { xs: 450, sm: 580 },
             borderRadius: 1,
             transition: "all 0.3s ease",
           }}
         >
           <CardContent>
             <Stack direction="row" alignItems="center" spacing={2}>
+              {/* فیلد انتخاب دیتابیس از لیست */}
               <Autocomplete
-                options={dataBases}
-                getOptionLabel={(option: any) => option.name || ""}
+                options={databaseOptions}
+                getOptionLabel={(option) => option.name}
                 value={selectedDB}
-                onChange={(_, newValue) => setSelectedDB(newValue)}
+                onChange={(_, newValue) => {
+                  setSelectedDB(newValue);
+                }}
+                disableClearable={!!selectedDB}
+                isOptionEqualToValue={(option, value) => option.id === value.id}
                 renderInput={(params) => (
                   <TextField
-                    sx={{
-                      width: 400,
-                    }}
                     {...params}
                     label={t("form", "database")}
                     variant="outlined"
+                    sx={{ width: { md: 400, xs: 150 } }}
                   />
                 )}
               />
+
+              {/* دکمه‌های عملیات (افزودن / حذف) */}
               <Stack direction="row" spacing={0.5}>
-                <IconButton color="success" onClick={handleAdd}>
+                {/* دکمه افزودن دیتابیس جدید */}
+                <IconButton
+                  sx={{
+                    transition: "transform 0.2s",
+                    "&:hover": { transform: "scale(1.2)" },
+                  }}
+                  color="success"
+                  onClick={handleAdd}
+                >
                   <AddCircleSharpIcon sx={{ fontSize: 30 }} />
                 </IconButton>
-                {
-                  //! dont delet this comment
-                  /* 
+
+                {/* دکمه حذف دیتابیس انتخاب‌شده */}
                 <IconButton
-                  color="primary"
-                  onClick={handleEdit}
-                  disabled={loading || !selectedDB}
-                >
-                  <EditSharpIcon sx={{ fontSize: 30 }} />
-                </IconButton> */
-                }
-                <IconButton
+                  sx={{
+                    transition: "transform 0.2s",
+                    "&:hover": { transform: "scale(1.2)" },
+                  }}
                   color="error"
                   onClick={handleDelete}
                   disabled={loading || !selectedDB}

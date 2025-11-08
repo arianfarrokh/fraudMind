@@ -7,6 +7,7 @@ type FraudMindColumnType = {
   title: string;
   description?: string;
   columnType: ColumnType;
+  columnIndex: number;
   isNullable: boolean;
   isUnique: boolean;
 };
@@ -20,18 +21,20 @@ type FraudMindTableType = {
 
 type AddNewTableVariable = {
   id: ID;
-  schemaId: ID;
+  fraudMindSchemaId: ID;
   name: string;
   description?: string;
   columns: FraudMindColumnType[];
 };
+
 type AddNewColumnsVariable = {
   id: ID;
   title: string;
   description?: string;
   name: string;
   columnType: ColumnType;
+  columnIndex: number;
   isNullable: boolean;
   isUnique: boolean;
-  tableId: ID;
+  fraudMindTableId: ID;
 };

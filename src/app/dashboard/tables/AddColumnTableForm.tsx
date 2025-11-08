@@ -29,6 +29,7 @@ const initialValues: FraudMindColumnType = {
   description: "",
   isNullable: false,
   isUnique: false,
+  columnIndex: 0,
 };
 
 const AddColumnTableForm: React.FC<Props> = ({ data, onCancel, onSave }) => {
@@ -38,7 +39,10 @@ const AddColumnTableForm: React.FC<Props> = ({ data, onCancel, onSave }) => {
     name: yup
       .string()
       .required(t("error", "required-field"))
-      .matches(/^[A-Za-z]+$/, t("error", "english-only-not-space")),
+      .matches(
+        /^[A-Za-z0-9_@.#$%!&*()]+$/,
+        t("error", "english-only-not-space")
+      ),
     title: yup.string().required(t("error", "required-field")),
     columnType: yup
       .mixed<ColumnType>()
@@ -60,6 +64,14 @@ const AddColumnTableForm: React.FC<Props> = ({ data, onCancel, onSave }) => {
 
   return (
     <Box component="form" onSubmit={formik.handleSubmit}>
+      <FullWidthTextField
+        formik={formik}
+        id="columnIndex"
+        name="columnIndex"
+        label={t("form", "columnIndex")}
+        type="number"
+        disabled
+      />
       <FullWidthTextField
         formik={formik}
         id="name"
@@ -124,7 +136,12 @@ const AddColumnTableForm: React.FC<Props> = ({ data, onCancel, onSave }) => {
         <Button variant="contained" color="error" onClick={onCancel}>
           {t("form", "close")}
         </Button>
-        <Button variant="contained" color="success" type="submit">
+        <Button
+          disabled={!formik.isValid}
+          variant="contained"
+          color="success"
+          type="submit"
+        >
           {t("form", "save")}
         </Button>
       </Stack>

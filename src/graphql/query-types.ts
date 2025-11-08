@@ -81,11 +81,11 @@ export const initPaginationModel = {
 };
 
 export interface IdVariable {
-  id: number;
+  id: ID;
 }
 export interface InputIdVariable {
   input: {
-    id: string | number;
+    id: ID;
   };
 }
 export interface InputVariable<TVariable> {

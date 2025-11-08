@@ -34,5 +34,7 @@
 
   "only-csv-txt-unl": "فقط فایل با فرمت csv,txt,unl مجاز است",
   "upload-failed": "بارگذاری با خطا مواجه شد",
-  "try-again-later": "لطفا بعدا تلاش کنید"
+  "try-again-later": "لطفا بعدا تلاش کنید",
+  "failed-to-load": "خطا در نمایش {0}",
+  "failed-to-delete": "خطا در حذف {0}"
 }

@@ -65,8 +65,8 @@
   "Tipax": "تیپاکس",
   "Enter-the-attribute-value": "مقدار ویژگی را وارد کنید ",
   "provinces-list": "لیست استان ها",
-  "tags": "برچسب‌ها",
   "tag": "برچسب",
+  "tags": "برچسب‌ها",
 
   "product-categories": "دسته‌بندی‌های کالا",
   "product-category": "دسته‌بندی کالا",
@@ -125,5 +125,9 @@
   "table": "جدول",
   "tables": "جداول",
   "field": "فیلد",
-  "column": "ستون"
+  "column": "ستون",
+  "scenario": "سناریو",
+  "scenario2":"سناریویی",
+  "columnIndex": "شماره ستون",
+  "scheama": "پایگاه داده"
 }

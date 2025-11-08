@@ -1,4 +1,4 @@
-'use client'
+"use client";
 import { RTLThemeProvider } from "@/components/rtl-layout/RTLThemeProvider";
 import React, { ReactNode } from "react";
 import { TranslationProvider } from "./translation";
@@ -19,11 +19,11 @@ function RootProvider({ children }: Props) {
       <RTLThemeProvider>
         <MUIThemeProvider>
           <TranslationProvider initialLocale="fa">
-            <DialogProvider>
-              <AlertProvider>
-                <ApolloWrapper>{children}</ApolloWrapper>
-              </AlertProvider>
-            </DialogProvider>
+            <ApolloWrapper>
+              <DialogProvider>
+                <AlertProvider>{children}</AlertProvider>
+              </DialogProvider>
+            </ApolloWrapper>
           </TranslationProvider>
         </MUIThemeProvider>
       </RTLThemeProvider>

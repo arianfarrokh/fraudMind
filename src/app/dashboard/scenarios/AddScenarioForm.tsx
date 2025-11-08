@@ -6,18 +6,20 @@ import FullWidthTextField from "@/components/text-field/FullWidthTextField";
 import { useTranslation } from "@/providers/translation";
 
 type Props = {
-  data: FraudMindTableType;
+  data: ScenarioType;
   onCancel: () => void;
-  onSave: (data: FraudMindTableType) => void;
+  onSave: (data: ScenarioType) => void;
 };
 
-const initialValues: FraudMindTableType = {
+const initialValues: ScenarioType = {
   id: 0,
   name: "",
-  fraudMindColumns: [],
+  description: "",
+  sqlText: "",
+  fraudMindSchemaId: 0,
 };
 
-const AddTableForm: React.FC<Props> = ({ data, onCancel, onSave }) => {
+const AddScenarioForm: React.FC<Props> = ({ data, onCancel, onSave }) => {
   const { t } = useTranslation("error");
   const validationSchema = yup.object({
     name: yup
@@ -38,7 +40,7 @@ const AddTableForm: React.FC<Props> = ({ data, onCancel, onSave }) => {
       }),
   });
 
-  const formik = useFormik<FraudMindTableType>({
+  const formik = useFormik<ScenarioType>({
     initialValues,
     validationSchema,
     onSubmit: (value) => {
@@ -60,12 +62,7 @@ const AddTableForm: React.FC<Props> = ({ data, onCancel, onSave }) => {
           {t("form", "close")}
         </Button>
 
-        <Button
-          disabled={!formik.isValid}
-          variant="contained"
-          color="success"
-          type="submit"
-        >
+        <Button variant="contained" color="success" type="submit">
           {t("form", "save")}
         </Button>
       </Stack>
@@ -73,4 +70,4 @@ const AddTableForm: React.FC<Props> = ({ data, onCancel, onSave }) => {
   );
 };
 
-export default AddTableForm;
+export default AddScenarioForm;

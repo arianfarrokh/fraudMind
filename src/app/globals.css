@@ -57,16 +57,28 @@
 
 /* Global variables */
 :root {
-  --color-yellow: #1d3557;
-  --color-red: #B90A33FF;
-  --color-charcoal: #457b9d;
-  --color-charcoal-light: #1d3557;
+  --color-sidegray: linear-gradient(
+    265deg,
+    rgba(255, 255, 255, 1) 0%,
+    rgba(194, 194, 194, 1) 100%
+  );
+  --color-sideblue: linear-gradient(
+    359deg,
+    rgba(49, 91, 245, 1) 0%,
+    rgba(30, 139, 247, 1) 100%
+  );
+  --color-yellow: #3c4a63;
+  --color-red: #b90a33ff;
+  --color-charcoal: #639ef7;
+  --color-charcoal-light: #1e1e2e;
   --color-hover-black: #a35467;
   --color-black: #000000;
   --color-white: #ffffff;
-  --color-grey: #ccc;
-  --cokor-Brown:#a8dadc;
-  --font-main: 'IranYekan', 'IRANSans', sans-serif;
+  --color-gray: #fafafa;
+  --color-gray2: #d6d6d6;
+  --color-Brown: #a8dadc;
+  --color-darkgray: #7f8aa1;
+  --font-main: "IranYekan", "IRANSans", sans-serif;
   scroll-behavior: smooth;
 }
 
@@ -76,7 +88,6 @@ body {
   background-color: var(--color-grey);
   color: var(--color-black);
 }
-
 
 .menu-icon {
   color: var(--color-grey);

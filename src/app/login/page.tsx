@@ -160,10 +160,10 @@ export default function LoginPage() {
               slotProps={{
                 input: {
                   endAdornment: (
-                    <InputAdornment position="end">
-                      <IconButton>
+                    <InputAdornment position="end" sx={{ mr: 1 }}>
+                      <Box sx={{ display: "flex", alignItems: "center" }}>
                         <FaUserSecret color="#fff" fontSize={20} />
-                      </IconButton>
+                      </Box>
                     </InputAdornment>
                   ),
                 },
@@ -199,8 +199,11 @@ export default function LoginPage() {
                   endAdornment: (
                     <InputAdornment position="end">
                       <IconButton
-                        onClick={handleClickShowPassword}
+                        tabIndex={-1}
                         sx={{ color: "#fff" }}
+                        onMouseDown={() => setShowPassword(true)}
+                        onMouseUp={() => setShowPassword(false)}
+                        onMouseLeave={() => setShowPassword(false)}
                       >
                         {showPassword ? <FaEyeSlash /> : <FaEye />}
                       </IconButton>

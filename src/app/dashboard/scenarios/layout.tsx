@@ -1,12 +1,15 @@
-import DashboardLayout from '@/components/layouts/dashboard-layout/dashboardLayout'
-import React, { PropsWithChildren } from 'react'
+import { PROJECT_DESCRIPTION, PROJECT_TITLE } from "@/utils/constant";
+import { Metadata } from "next";
 
-
-
-const HomeLayout:React.FC<PropsWithChildren> = ({children}) => {
-  return (
-    <>{children}</>
-  )
+export default function Layout({
+  children,
+}: Readonly<{
+  children: React.ReactNode;
+}>) {
+  return <>{children}</>;
 }
 
-export default HomeLayout
+export const metadata: Metadata = {
+  title: `${PROJECT_TITLE} | جداول`,
+  description: PROJECT_DESCRIPTION,
+};

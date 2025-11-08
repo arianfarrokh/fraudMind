@@ -1,6 +1,7 @@
 import { useThemeContext } from "@/theme/ThemeContext";
 import { IoMenu, IoNotifications } from "react-icons/io5";
-import { MdDarkMode, MdLightMode } from "react-icons/md";
+import NightsStayIcon from "@mui/icons-material/NightsStay";
+import LightModeIcon from "@mui/icons-material/LightMode";
 import { useTranslation } from "@/providers/translation";
 import SideMenu from "./Sidebar";
 import LogOutDialog from "@/components/action-item/LogOutDialog";
@@ -17,13 +18,25 @@ import {
   Toolbar,
   Tooltip,
   Typography,
+  useMediaQuery,
+  useTheme,
 } from "@mui/material";
 import React, { useState } from "react";
 import Link from "next/link";
-import PersonIcon from "@mui/icons-material/Person";
+import EmojiPeopleIcon from "@mui/icons-material/EmojiPeople";
+import MenuOpenIcon from "@mui/icons-material/MenuOpen";
+import MenuIcon from "@mui/icons-material/Menu";
 
-export default function DashboardHeader() {
+export default function DashboardHeader({
+  collapsed,
+  setCollapsed,
+}: {
+  collapsed: boolean;
+  setCollapsed: (v: boolean) => void;
+}) {
   const [open, setOpen] = useState(false);
+  // const [collapsed, setCollapsed] = useState(false);
+
   const [logoutDialogOpen, setLogoutDialogOpen] = useState(false);
   const [anchorElUser, setAnchorElUser] = useState<null | HTMLElement>(null);
   const { t } = useTranslation("common");
@@ -31,7 +44,21 @@ export default function DashboardHeader() {
   const menuAppbar = React.useId();
   const router = useRouter();
 
-  const handleToggleDrawer = () => setOpen(!open);
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("lg"));
+
+  const handleToggleDrawer = () => {
+    if (window.innerWidth < 1024) {
+      setOpen(!open);
+    } else {
+      setCollapsed(!collapsed); // اینجا از setCollapsed استفاده می‌کنیم
+    }
+  };
+
+  // فقط برای بستن در موبایل
+  const handleCloseDrawer = () => {
+    setOpen(false);
+  };
   const handleOpenUserMenu = (event: React.MouseEvent<HTMLElement>) =>
     setAnchorElUser(event.currentTarget);
   const handleCloseUserMenu = () => setAnchorElUser(null);
@@ -47,8 +74,9 @@ export default function DashboardHeader() {
     mode === "light" ? `var(${light})` : `var(${dark})`;
 
   const getHoverStyle = () => ({
-    bgcolor: mode === "light" ? "var(--color-yellow)" : "var(--color-charcoal)",
-    color: mode === "light" ? "var(--color-red)" : "var(--color-red)",
+    bgcolor:
+      mode === "light" ? "var(--color-gray2)" : "var(--color-charcoal-light)",
+    color: mode === "light" ? "var(--color-charcoal)" : "var(--color-charcoal)",
   });
 
   return (
@@ -56,38 +84,55 @@ export default function DashboardHeader() {
       <AppBar
         position="fixed"
         sx={{
-          bgcolor: getColor("--color-yellow", "--color-charcoal"),
+          bgcolor: getColor("--color-gray", "--color-charcoal-light"),
           color: getColor("--color-black", "--color-yellow"),
           boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
           zIndex: (theme) => theme.zIndex.drawer + 1,
         }}
       >
-        <Toolbar sx={{ pr: "24px", justifyContent: "space-between" }}>
+        <Toolbar
+          sx={{
+            pr: "12px",
+            pl: "12px",
+            minHeight: "48px !important", // ارتفاع کمتر از حالت پیش‌فرض (۶۴px)
+            justifyContent: "space-between",
+          }}
+        >
           <Box sx={{ display: "flex", alignItems: "center" }}>
-            <Box display={{ xs: "flex", lg: "none" }}>
+            <Box display={{ xs: "flex" }}>
               <IconButton
                 edge="start"
                 aria-label="open drawer"
                 onClick={handleToggleDrawer}
                 sx={{
                   // marginRight: "36px",
-                  bgcolor: getColor("--color-charcoal", "--color-yellow"),
-                  color: getColor("--color-yellow", "--color-black"),
+                  bgcolor: getColor("--color-gray", "--color-yellow"),
+                  color: getColor("--color-black", "--color-black"),
                   "&:hover": getHoverStyle(),
                   borderRadius: "8px",
                   transition: "all 0.3s ease",
                 }}
               >
-                <IoMenu size={24} />
+                {isMobile ? (
+                  <MenuIcon sx={{ fontSize: 13 }} />
+                ) : (
+                  <MenuOpenIcon
+                    sx={{
+                      fontSize: 16,
+                      transform: !collapsed ? "scaleX(-1)" : "none",
+                      transition: "transform 0.6 ease",
+                    }}
+                  />
+                )}
               </IconButton>
             </Box>
-            <Link href={"/home"}>
+            <Link href={"/dashboard"}>
               <Button
                 sx={{
                   fontWeight: "bold",
                   letterSpacing: "0.5px",
-                  fontSize: { xs: "0.7rem", md: "1.1rem" },
-                  color: getColor("--color-white", "--color-yellow"),
+                  fontSize: { xs: "0.6rem", md: "0.7rem" },
+                  color: getColor("--color-charcoal", "--color-white"),
                 }}
               >
                 {t("common", "fraudMind")}
@@ -101,8 +146,8 @@ export default function DashboardHeader() {
                 size="large"
                 aria-label="notifications"
                 sx={{
-                  bgcolor: getColor("--color-charcoal", "--color-charcoal"),
-                  color: getColor("--color-black", "--color-black"),
+                  bgcolor: getColor("--color-gray", "--color-charcoal-light"),
+                  color: getColor("--color-darkgray", "--color-white"),
                   "&:hover": getHoverStyle(),
                   p: 1,
                   transition: "all 0.3s ease",
@@ -110,7 +155,7 @@ export default function DashboardHeader() {
                 }}
               >
                 <Badge color="error">
-                  <IoNotifications size={24} />
+                  <IoNotifications size={13} />
                 </Badge>
               </IconButton>
             </Tooltip>
@@ -125,34 +170,36 @@ export default function DashboardHeader() {
               <IconButton
                 onClick={toggleColorMode}
                 sx={{
-                  bgcolor: getColor("--color-charcoal", "--color-charcoal"),
-                  color: getColor("--color-black", "--color-black"),
+                  bgcolor: getColor("--color-gray", "--color-charcoal-light"),
+                  color: getColor("--color-darkgray", "--color-white"),
                   "&:hover": getHoverStyle(),
                   borderRadius: "10px",
-                  p: 1.25,
+                  // p: 1.1,
                   transition: "all 0.3s ease",
                 }}
               >
                 {mode === "light" ? (
-                  <MdDarkMode size={20} />
+                  <NightsStayIcon sx={{ fontSize: 14 }} />
                 ) : (
-                  <MdLightMode size={20} />
+                  <LightModeIcon sx={{ fontSize: 14 }} />
                 )}
               </IconButton>
             </Tooltip>
 
             <Tooltip title={t("common", "logout")}>
-              <IconButton sx={{ p: 0 }} onClick={handleOpenUserMenu}>
-                <PersonIcon
+              <IconButton
+                sx={{
+                  bgcolor: getColor("--color-gray", "--color-charcoal-light"),
+                  color: getColor("--color-darkgray", "--color-white"),
+                  "&:hover": getHoverStyle(),
+                  transition: "all 0.3s ease",
+                  borderRadius: "10px",
+                }}
+                onClick={handleOpenUserMenu}
+              >
+                <EmojiPeopleIcon
                   sx={{
-                    bgcolor: getColor("--color-charcoal", "--color-charcoal"),
-                    color: getColor("--color-black", "--color-black"),
-                    "&:hover": getHoverStyle(),
-                    width: 40,
-                    height: 40,
-                    transition: "all 0.3s ease",
-                    borderRadius: "10px",
-                    fontSize: "10px",
+                    fontSize: 14,
                   }}
                 />
               </IconButton>
@@ -193,7 +240,6 @@ export default function DashboardHeader() {
           </Box>
         </Toolbar>
       </AppBar>
-
       <LogOutDialog
         open={logoutDialogOpen}
         handleLogoutConfirm={handleLogoutConfirm}
@@ -201,8 +247,11 @@ export default function DashboardHeader() {
         title={t("common", "logout")}
         message={t("common", "are-you-sure-logout")}
       />
-
-      <SideMenu open={open} onCloseDrawer={handleToggleDrawer} />
+      <SideMenu
+        open={open}
+        onCloseDrawer={handleCloseDrawer} // ✅ فقط برای موبایل
+        collapsed={collapsed}
+      />
     </React.Fragment>
   );
 }

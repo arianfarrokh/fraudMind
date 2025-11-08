@@ -42,7 +42,8 @@
 
   "management": "مدیریت",
 
-  "delete": "حذف {0}",
+  "delete": "حذف",
+  "deletee": "حذف {0}",
 
   "notifications": "اعلان‌ها",
   "notification": "اعلان‌",
@@ -88,11 +89,15 @@
   "understand": "متوجه شدم",
   "are-you-sure-delet": "آیا از حذف {0} مطمئن هستید",
   "no-item-added": "هیچ {0} اضافه نشده است",
-  "name": "نام {0}",
+  "namee": "نام {0}",
+  "name": "نام",
   "kind": "نوع {0}",
   "only-csv": "فقط فایل CSV مجاز است.",
   "upload": "بارگذاری",
   "file-uploaded-successfully": "فایل یا موفقیت بارگذاری شد",
   "Upload": "بارگذاری",
-  "back": "بازگشت"
-}
+  "back": "بازگشت",
+  "select-desired": "{0} مورد نظر راانتخاب کنید",
+  "no-results": " هیچ {0} ایجاد نشده است "
+  }
+

@@ -103,7 +103,9 @@ const DataGridViewServer: FC<Props> = ({
         columns={columns}
         initialState={{ pagination: { paginationModel: { pageSize: 10 } } }}
         pageSizeOptions={[5, 10, 25, 100]}
-        rowCount={totalCount || 0}
+        rowCount={
+          rest.paginationMode === "client" ? undefined : totalCount || 0
+        }
         sortingMode="server"
         filterMode="server"
         paginationMode="server"

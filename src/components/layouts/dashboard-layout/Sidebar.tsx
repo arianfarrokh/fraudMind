@@ -16,9 +16,10 @@ import { useThemeContext } from "@/theme/ThemeContext";
 type Props = {
   open: boolean;
   onCloseDrawer: () => void;
+  collapsed: boolean;
 };
 
-const SideMenu: React.FC<Props> = ({ open, onCloseDrawer }) => {
+const SideMenu: React.FC<Props> = ({ open, onCloseDrawer, collapsed }) => {
   const theme = useTheme();
   const { mode } = useThemeContext();
 
@@ -32,12 +33,11 @@ const SideMenu: React.FC<Props> = ({ open, onCloseDrawer }) => {
       onClose={onCloseDrawer}
       sx={{
         "& .MuiDrawer-paper": {
-          bgcolor:
-            mode === "dark"
-              ? "var(--color-charcoal-light)"
-              : "var(--color-charcoal)",
-          color: "var(--color-yellow)",
-          width: 200,
+          background:
+            mode === "dark" ? "var(--color-sideblue)" : "var(--color-sidegray)",
+          color: "var(--color-charcoal)",
+          width: collapsed ? 80 : 200,
+          transition: "width 0.1s ease-out",
           height: "100vh",
           overflowY: "hidden",
           display: "flex",
@@ -53,7 +53,7 @@ const SideMenu: React.FC<Props> = ({ open, onCloseDrawer }) => {
           px: [1],
         }}
       >
-        <IconButton
+        {/* <IconButton
           onClick={onCloseDrawer}
           sx={{
             color:
@@ -66,11 +66,8 @@ const SideMenu: React.FC<Props> = ({ open, onCloseDrawer }) => {
           }}
         >
           {theme.direction === "rtl" ? <FaChevronRight /> : <FaChevronLeft />}
-        </IconButton>
+        </IconButton> */}
       </Toolbar>
-
-      <Divider sx={{ borderColor: "var(--color-yellow)" }} />
-
       <Box
         sx={{
           px: 1,
@@ -80,7 +77,7 @@ const SideMenu: React.FC<Props> = ({ open, onCloseDrawer }) => {
           overflow: "hidden",
         }}
       >
-        <MenuList onCloseDrawer={onCloseDrawer} />
+        <MenuList onCloseDrawer={onCloseDrawer} collapsed={collapsed} />
       </Box>
     </Drawer>
   );
